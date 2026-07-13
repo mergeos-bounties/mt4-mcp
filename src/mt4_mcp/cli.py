@@ -134,6 +134,119 @@ def serve_cmd() -> None:
 
     run_stdio()
 
+"""
+mt4-mcp status — V0.11.G.7 老板下单
+
+Task: #291 / mergeos-bounties/mt4-mcp #2
+Reward: 25 MRG
+Goal: `mt4-mcp status` prints mode, balance, equity, open order count.
+Acceptance:
+  - [x] Works offline mock
+  - [x] Test (tests/test_status.py)
+  - [x] README updated
+
+This adds ONE command: `mt4-mcp status` that:
+  - Resolves current mode (mock|live)
+  - Pulls account().balance / account().equity
+  - Counts len(orders()) for open orders
+  - Renders a clean Rich table when stdout is a TTY,
+    falls back to JSON when --json or non-TTY (CI-friendly).
+"""
+
+
+def _fmt_money(value: float | int | None, currency: str = "USD") -> str:
+    if value is None:
+        return "—"
+    try:
+        return f"{float(value):,.2f} {currency}"
+    except (TypeError, ValueError):
+        return f"{value} {currency}"
+
+
+@app.command("status")
+def status_cmd(
+    json_output: bool = typer.Option(
+        False,
+        "--json",
+        help="Emit JSON (default for non-TTY / CI / piping).",
+    ),
+    show_orders: bool = typer.Option(
+        False,
+        "--orders",
+        help="Also list the open orders (off by default to keep status compact).",
+    ),
+) -> None:
+    """Print mode, balance, equity, and open-order count."""
+    backend = get_backend()
+    mode = get_mode()
+    account = backend.account()
+    orders = backend.orders()
+
+    payload = {
+        "mt4_mcp_version": __version__,
+        "mode": mode,
+        "backend": getattr(backend, "name", mode),
+        "account": {
+            "login": account.get("login"),
+            "server": account.get("server"),
+            "currency": account.get("currency", "USD"),
+            "leverage": account.get("leverage"),
+            "balance": account.get("balance"),
+            "equity": account.get("equity"),
+            "margin": account.get("margin"),
+            "free_margin": account.get("free_margin"),
+            "margin_level": account.get("margin_level"),
+        },
+        "open_orders_count": len(orders),
+        "open_orders": orders if show_orders else None,
+    }
+
+    # Auto-pick JSON when not a TTY (so CI / pipelines get machine-readable output)
+    use_json = json_output or not sys.stdout.isatty()
+
+    if use_json:
+        typer.echo(json.dumps(payload, indent=2, default=str))
+        return
+
+    table = Table(title=f"mt4-mcp status — mode={mode}")
+    table.add_column("Field", style="cyan", no_wrap=True)
+    table.add_column("Value", style="white")
+
+    acct = payload["account"]
+    table.add_row("version", __version__)
+    table.add_row("mode", mode)
+    table.add_row("backend", payload["backend"])
+    table.add_row("login", str(acct["login"]))
+    table.add_row("server", str(acct["server"]))
+    table.add_row("currency", str(acct["currency"]))
+    table.add_row("leverage", str(acct["leverage"]))
+    table.add_row("balance", _fmt_money(acct["balance"], acct["currency"]))
+    table.add_row("equity", _fmt_money(acct["equity"], acct["currency"]))
+    table.add_row("margin", _fmt_money(acct["margin"], acct["currency"]))
+    table.add_row("free_margin", _fmt_money(acct["free_margin"], acct["currency"]))
+    table.add_row("margin_level", str(acct["margin_level"]))
+    table.add_row("open_orders_count", str(payload["open_orders_count"]))
+
+    console.print(table)
+
+    if show_orders and orders:
+        orders_table = Table(title=f"Open orders ({len(orders)})")
+        orders_table.add_column("ticket", style="magenta")
+        orders_table.add_column("symbol", style="cyan")
+        orders_table.add_column("side", style="yellow")
+        orders_table.add_column("volume", justify="right")
+        orders_table.add_column("price", justify="right")
+        for o in orders:
+            orders_table.add_row(
+                str(o.get("ticket", "")),
+                str(o.get("symbol", "")),
+                str(o.get("side", "")),
+                f"{o.get('volume', 0):.2f}",
+                f"{o.get('price_open', o.get('price', 0)):.5f}",
+            )
+        console.print(orders_table)
+
+
 
 def main() -> None:
     app()

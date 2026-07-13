@@ -49,6 +49,66 @@ Mock mode needs **no** MetaTrader install.
 
 ## CLI reference
 
+### status
+
+```
+mt4-mcp status [--json] [--orders]
+```
+
+Print the current **mode** (mock or live), **balance**, **equity**, **margin**, **free margin**, **margin level**, and the **open-order count** for the active backend.
+
+Flags:
+- `--json` — emit machine-readable JSON (auto-detected when stdout is not a TTY, so CI / pipes just work)
+- `--orders` — also print a table of every open order
+
+Sample (TTY):
+
+```
+                    mt4-mcp status — mode=mock
+┌─────────────────┬──────────────────────────────┐
+│ Field           │ Value                        │
+├─────────────────┼──────────────────────────────┤
+│ version         │ 0.1.0                        │
+│ mode            │ mock                         │
+│ backend         │ mock                         │
+│ login           │ 900001                       │
+│ server          │ MockBroker-Demo              │
+│ currency        │ USD                          │
+│ leverage        │ 100                          │
+│ balance         │ 10,000.00 USD                │
+│ equity          │ 10,000.00 USD                │
+│ margin          │ 0.00 USD                     │
+│ free_margin     │ 10,000.00 USD                │
+│ margin_level    │ None                         │
+│ open_orders_count│ 0                           │
+└─────────────────┴──────────────────────────────┘
+```
+
+Sample (`--json`):
+
+```json
+{
+  "mt4_mcp_version": "0.1.0",
+  "mode": "mock",
+  "backend": "mock",
+  "account": {
+    "login": 900001,
+    "server": "MockBroker-Demo",
+    "currency": "USD",
+    "leverage": 100,
+    "balance": 10000.0,
+    "equity": 10000.0,
+    "margin": 0,
+    "free_margin": 10000.0,
+    "margin_level": null
+  },
+  "open_orders_count": 0
+}
+```
+
+Resolved issue: [mt4-mcp#2](https://github.com/mergeos-bounties/mt4-mcp/issues/2) / [awesome-agent-bounties#291](https://github.com/Vikingr2023/awesome-agent-bounties/issues/291).
+
+
 | Command | Purpose |
 | --- | --- |
 | `mt4-mcp version` | Version + mode |

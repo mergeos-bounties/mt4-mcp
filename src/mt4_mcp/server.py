@@ -63,6 +63,12 @@ def mt4_quote(symbol: str) -> str:
 
 
 @mcp.tool()
+def mt4_ticks(symbol: str, limit: int = 20) -> str:
+    """Recent quote ticks for a symbol, newest first."""
+    return _j(get_backend().ticks(symbol, limit))
+
+
+@mcp.tool()
 def mt4_orders() -> str:
     """List open orders/tickets."""
     return _j(get_backend().orders())

@@ -65,6 +65,7 @@ class MockBackend:
             },
         }
         self._orders: dict[int, dict[str, Any]] = {}
+        self._ticks: dict[str, list[dict[str, Any]]] = {symbol: [] for symbol in self._symbols}
         self._history: list[dict[str, Any]] = [
             {
                 "ticket": 100001,
@@ -136,7 +137,15 @@ class MockBackend:
         s["bid"] = round(mid - s["point"] * 10, s["digits"])
         s["ask"] = round(mid + s["point"] * 10, s["digits"])
         self._fill_pending_on_cross(s["symbol"])
-        return {"ok": True, **deepcopy(s), "time": time.time()}
+        tick = {"ok": True, **deepcopy(s), "time": time.time()}
+        self._ticks.setdefault(s["symbol"], []).insert(0, tick)
+        self._ticks[s["symbol"]] = self._ticks[s["symbol"]][:100]
+        return tick
+
+    def ticks(self, symbol: str, limit: int = 20) -> list[dict[str, Any]]:
+        sym = symbol.upper()
+        n = max(1, min(int(limit), 100))
+        return [deepcopy(t) for t in self._ticks.get(sym, [])[:n]]
 
     def set_quote(self, symbol: str, bid: float, ask: float) -> dict[str, Any]:
         s = self._symbols.get(symbol.upper())

@@ -66,6 +66,21 @@ def test_pending_sell_stop_fills_on_quote_cross():
     assert order["filled_from"] == "sell_stop"
 
 
+def test_tick_history_buffer():
+    b = MockBackend()
+    b.seed_demo()
+    first = b.quote("EURUSD")
+    second = b.quote("EURUSD")
+
+    ticks = b.ticks("EURUSD", limit=2)
+
+    assert len(ticks) == 2
+    assert ticks[0]["time"] == second["time"]
+    assert ticks[1]["time"] == first["time"]
+    assert all(t["symbol"] == "EURUSD" for t in ticks)
+    assert b.ticks("EURUSD", limit=1)[0]["time"] == second["time"]
+
+
 def test_get_backend_mock():
     set_mode("mock")
     assert get_backend().name == "mock"

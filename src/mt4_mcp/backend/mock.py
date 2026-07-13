@@ -135,7 +135,38 @@ class MockBackend:
         mid = (s["bid"] + s["ask"]) / 2
         s["bid"] = round(mid - s["point"] * 10, s["digits"])
         s["ask"] = round(mid + s["point"] * 10, s["digits"])
+        self._fill_pending_on_cross(s["symbol"])
         return {"ok": True, **deepcopy(s), "time": time.time()}
+
+    def set_quote(self, symbol: str, bid: float, ask: float) -> dict[str, Any]:
+        s = self._symbols.get(symbol.upper())
+        if not s:
+            return {"ok": False, "error": f"unknown symbol {symbol}"}
+        s["bid"] = round(float(bid), s["digits"])
+        s["ask"] = round(float(ask), s["digits"])
+        self._fill_pending_on_cross(s["symbol"])
+        return {"ok": True, **deepcopy(s), "time": time.time()}
+
+    def _fill_pending_on_cross(self, symbol: str) -> None:
+        q = self._symbols[symbol]
+        now = time.time()
+        for order in self._orders.values():
+            if order["symbol"] != symbol or order["type"] == "market":
+                continue
+            pending_type = order["type"]
+            price = float(order["open_price"])
+            should_fill = (
+                (pending_type == "buy_limit" and q["ask"] <= price)
+                or (pending_type == "sell_limit" and q["bid"] >= price)
+                or (pending_type == "buy_stop" and q["ask"] >= price)
+                or (pending_type == "sell_stop" and q["bid"] <= price)
+            )
+            if should_fill:
+                order["type"] = "market"
+                order["filled_from"] = pending_type
+                order["filled_at"] = now
+                order["current_price"] = q["bid"] if order["side"] == "buy" else q["ask"]
+        self._mark_to_market()
 
     def orders(self) -> list[dict[str, Any]]:
         self._mark_to_market()

@@ -82,6 +82,14 @@ mt4-mcp serve
 
 ---
 
+## Mock pending fills
+
+In mock mode, pending orders are converted to market orders when quotes cross
+their trigger price. The mock supports deterministic tests for `buy_limit`,
+`sell_limit`, `buy_stop`, and `sell_stop` crossing behavior.
+
+---
+
 ## MCP host config
 
 ```json

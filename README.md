@@ -76,6 +76,7 @@ mt4-mcp serve
 | `mt4_account` | Balance, equity, margin |
 | `mt4_symbols` | Symbol list |
 | `mt4_quote` | Bid/ask for a symbol |
+| `mt4_ticks` | Recent quote ticks for a symbol |
 | `mt4_orders` | Open orders |
 | `mt4_order_send` | Market/pending OrderSend-style |
 | `mt4_order_modify` | SL/TP/price modify |

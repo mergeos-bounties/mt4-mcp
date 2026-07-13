@@ -24,6 +24,7 @@ TOOL_NAMES = [
     "mt4_account",
     "mt4_symbols",
     "mt4_quote",
+    "mt4_ticks",
     "mt4_orders",
     "mt4_order_send",
     "mt4_order_modify",
@@ -113,6 +114,10 @@ def call_cmd(
         "mt4_account": b.account,
         "mt4_symbols": b.symbols,
         "mt4_quote": lambda: b.quote(str(kv.get("symbol", "EURUSD"))),
+        "mt4_ticks": lambda: b.ticks(
+            str(kv.get("symbol", "EURUSD")),
+            int(kv.get("limit", 20)),
+        ),
         "mt4_orders": b.orders,
         "mt4_order_send": lambda: b.order_send(
             str(kv.get("symbol", "EURUSD")),

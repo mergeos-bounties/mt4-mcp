@@ -79,6 +79,9 @@ class LiveBackend:
     def quote(self, symbol: str) -> dict[str, Any]:
         return self._unavailable("quote")
 
+    def ticks(self, symbol: str, limit: int = 20) -> list[dict[str, Any]]:
+        return []
+
     def orders(self) -> list[dict[str, Any]]:
         return []
 

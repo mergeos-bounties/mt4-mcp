@@ -36,3 +36,9 @@ def test_status_prints_account_summary():
     assert "balance" in r.stdout
     assert "equity" in r.stdout
     assert "open_orders" in r.stdout
+
+
+def test_call_ticks():
+    r = runner.invoke(app, ["call", "ticks", "symbol=EURUSD", "limit=1"])
+    assert r.exit_code == 0
+    assert "EURUSD" in r.stdout

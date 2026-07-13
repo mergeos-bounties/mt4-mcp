@@ -3,6 +3,7 @@ from mt4_mcp.server import (
     mt4_doctor,
     mt4_order_send,
     mt4_seed_demo,
+    mt4_ticks,
 )
 
 
@@ -10,5 +11,6 @@ def test_tools_json():
     assert "mock" in mt4_doctor()
     assert "ok" in mt4_seed_demo()
     assert "balance" in mt4_account()
+    assert "[" in mt4_ticks("EURUSD", 5)
     r = mt4_order_send("EURUSD", "sell", 0.05)
     assert "ticket" in r or "ok" in r

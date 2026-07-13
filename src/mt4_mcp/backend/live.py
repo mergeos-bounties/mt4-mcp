@@ -7,6 +7,7 @@ from typing import Any
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
+from mt4_mcp.backend.policy import validate_live_order
 from mt4_mcp.config import bridge_file, bridge_url
 
 
@@ -82,6 +83,11 @@ class LiveBackend:
         return []
 
     def order_send(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        symbol = kwargs.get("symbol", args[0] if len(args) > 0 else "")
+        volume = kwargs.get("volume", args[2] if len(args) > 2 else 0)
+        policy = validate_live_order(str(symbol), float(volume))
+        if not policy["ok"]:
+            return policy
         return self._unavailable("order_send")
 
     def order_modify(self, *args: Any, **kwargs: Any) -> dict[str, Any]:

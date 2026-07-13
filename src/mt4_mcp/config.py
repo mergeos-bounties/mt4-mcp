@@ -26,3 +26,19 @@ def bridge_url() -> str | None:
 def bridge_file() -> str | None:
     v = (os.environ.get(f"{_PREFIX}_BRIDGE_FILE") or "").strip()
     return v or None
+
+
+def symbol_allowlist() -> set[str]:
+    raw = os.environ.get(f"{_PREFIX}_SYMBOL_ALLOWLIST") or ""
+    return {item.strip().upper() for item in raw.split(",") if item.strip()}
+
+
+def max_volume() -> float | None:
+    raw = (os.environ.get(f"{_PREFIX}_MAX_VOLUME") or "").strip()
+    if not raw:
+        return None
+    try:
+        value = float(raw)
+    except ValueError:
+        return None
+    return value if value > 0 else None

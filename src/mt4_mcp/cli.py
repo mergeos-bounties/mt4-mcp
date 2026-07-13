@@ -46,6 +46,20 @@ def doctor_cmd() -> None:
     rprint(info)
 
 
+@app.command("status")
+def status_cmd() -> None:
+    """Print mode, balance, equity, and open order count."""
+    account = get_backend().account()
+    status = {
+        "mode": get_mode(),
+        "balance": account.get("balance"),
+        "equity": account.get("equity"),
+        "open_orders": account.get("open_orders"),
+        "version": __version__,
+    }
+    rprint(status)
+
+
 @app.command("demo")
 def demo_cmd() -> None:
     """Offline smoke: seed mock account and place/close a tiny trade."""

@@ -27,3 +27,12 @@ def test_call_account():
     r = runner.invoke(app, ["call", "account"])
     assert r.exit_code == 0
     assert "balance" in r.stdout
+
+
+def test_status_prints_account_summary():
+    r = runner.invoke(app, ["status"])
+    assert r.exit_code == 0
+    assert "mode" in r.stdout
+    assert "balance" in r.stdout
+    assert "equity" in r.stdout
+    assert "open_orders" in r.stdout

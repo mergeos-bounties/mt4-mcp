@@ -38,6 +38,7 @@ python -m venv .venv
 pip install -e ".[dev]"
 
 mt4-mcp version
+mt4-mcp status
 mt4-mcp demo
 mt4-mcp tools list
 pytest -q
@@ -52,6 +53,7 @@ Mock mode needs **no** MetaTrader install.
 | Command | Purpose |
 | --- | --- |
 | `mt4-mcp version` | Version + mode |
+| `mt4-mcp status` | Mode, balance, equity, and open order count |
 | `mt4-mcp demo` | Offline smoke of core backend APIs |
 | `mt4-mcp doctor` | Backend health |
 | `mt4-mcp serve` | MCP server over **stdio** |

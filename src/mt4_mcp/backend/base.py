@@ -1,0 +1,34 @@
+from __future__ import annotations
+
+from typing import Any, Protocol
+
+
+class MtBackend(Protocol):
+    name: str
+
+    def doctor(self) -> dict[str, Any]: ...
+    def seed_demo(self) -> dict[str, Any]: ...
+    def account(self) -> dict[str, Any]: ...
+    def symbols(self) -> list[dict[str, Any]]: ...
+    def quote(self, symbol: str) -> dict[str, Any]: ...
+    def orders(self) -> list[dict[str, Any]]: ...
+    def order_send(
+        self,
+        symbol: str,
+        side: str,
+        volume: float,
+        order_type: str = "market",
+        price: float | None = None,
+        sl: float | None = None,
+        tp: float | None = None,
+        comment: str = "",
+    ) -> dict[str, Any]: ...
+    def order_modify(
+        self,
+        ticket: int,
+        price: float | None = None,
+        sl: float | None = None,
+        tp: float | None = None,
+    ) -> dict[str, Any]: ...
+    def order_close(self, ticket: int, volume: float | None = None) -> dict[str, Any]: ...
+    def history(self, limit: int = 20) -> list[dict[str, Any]]: ...

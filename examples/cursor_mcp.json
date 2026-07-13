@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "mt4-mcp": {
+      "command": "mt4-mcp",
+      "args": ["serve"],
+      "env": { "MT4_MCP_MODE": "mock" }
+    }
+  }
+}

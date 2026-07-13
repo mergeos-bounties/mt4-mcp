@@ -38,6 +38,34 @@ def test_pending_requires_price():
     assert ok["ok"] is True
 
 
+def test_pending_buy_limit_fills_on_quote_cross():
+    b = MockBackend()
+    b.seed_demo()
+    pending = b.order_send("EURUSD", "buy", 0.1, "buy_limit", price=1.08)
+    ticket = pending["ticket"]
+
+    b.set_quote("EURUSD", bid=1.0798, ask=1.0800)
+    order = next(o for o in b.orders() if o["ticket"] == ticket)
+
+    assert order["type"] == "market"
+    assert order["open_price"] == 1.08
+    assert order["filled_from"] == "buy_limit"
+
+
+def test_pending_sell_stop_fills_on_quote_cross():
+    b = MockBackend()
+    b.seed_demo()
+    pending = b.order_send("EURUSD", "sell", 0.1, "sell_stop", price=1.08)
+    ticket = pending["ticket"]
+
+    b.set_quote("EURUSD", bid=1.0800, ask=1.0802)
+    order = next(o for o in b.orders() if o["ticket"] == ticket)
+
+    assert order["type"] == "market"
+    assert order["open_price"] == 1.08
+    assert order["filled_from"] == "sell_stop"
+
+
 def test_get_backend_mock():
     set_mode("mock")
     assert get_backend().name == "mock"

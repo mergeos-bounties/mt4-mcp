@@ -101,3 +101,12 @@ class LiveBackend:
 
     def history(self, limit: int = 20) -> list[dict[str, Any]]:
         return []
+
+    def history_export_json(self) -> dict[str, Any]:
+        return self._unavailable("history_export_json")
+
+    def quote_snapshot(self) -> dict[str, Any]:
+        return self._unavailable("quote_snapshot")
+
+    def account_summary(self) -> dict[str, Any]:
+        return self._unavailable("account_summary")

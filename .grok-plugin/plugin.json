@@ -1,0 +1,19 @@
+{
+  "name": "mt4-mcp",
+  "version": "0.1.0",
+  "description": "MetaTrader 4 account/quotes/orders (mock + live bridge). One-command install from GitHub for Grok + MCP hosts.",
+  "author": {
+    "name": "MergeOS / ThanhTrucSolutions",
+    "url": "https://github.com/mergeos-bounties"
+  },
+  "homepage": "https://github.com/mergeos-bounties/mt4-mcp",
+  "repository": "https://github.com/mergeos-bounties/mt4-mcp",
+  "license": "MIT",
+  "keywords": [
+    "mt4",
+    "metatrader",
+    "trading",
+    "mcp",
+    "mergeos"
+  ]
+}

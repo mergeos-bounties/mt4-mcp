@@ -12,6 +12,7 @@ class MockBackend:
 
     def __init__(self) -> None:
         self._ticket = 100000
+        self._account_snapshots: list[dict[str, Any]] = []
         self.seed_demo()
 
     def _next_ticket(self) -> int:
@@ -303,3 +304,55 @@ class MockBackend:
     def history(self, limit: int = 20) -> list[dict[str, Any]]:
         n = max(1, min(int(limit), 100))
         return [deepcopy(h) for h in self._history[:n]]
+
+    def history_export_json(self) -> dict[str, Any]:
+        """Export closed trade history with summary."""
+        exports = [deepcopy(h) for h in self._history]
+        total_profit = sum(h.get("profit", 0) for h in exports)
+        winning = sum(1 for h in exports if h.get("profit", 0) > 0)
+        losing = sum(1 for h in exports if h.get("profit", 0) < 0)
+        return {
+            "ok": True,
+            "total_trades": len(exports),
+            "total_profit": round(total_profit, 2),
+            "winning_trades": winning,
+            "losing_trades": losing,
+            "win_rate": round(winning / max(1, len(exports)) * 100, 1),
+            "trades": exports,
+        }
+
+    def quote_snapshot(self) -> dict[str, Any]:
+        """Get bid/ask quotes for all symbols with timestamps."""
+        quotes = {}
+        for sym in self._symbols:
+            quotes[sym] = self.quote(sym)
+        return {"ok": True, "time": time.time(), "quotes": quotes}
+
+    def account_summary(self) -> dict[str, Any]:
+        """Detailed account summary with equity curve demo."""
+        self._recalc()
+        self._account_snapshots.insert(
+            0,
+            {
+                "time": time.time(),
+                "balance": self._balance,
+                "equity": self._equity,
+                "margin": self._margin,
+            },
+        )
+        self._account_snapshots = self._account_snapshots[:30]
+        return {
+            "ok": True,
+            "login": self._login,
+            "server": self._server,
+            "currency": self._currency,
+            "leverage": self._leverage,
+            "balance": self._balance,
+            "equity": self._equity,
+            "margin": self._margin,
+            "free_margin": round(self._equity - self._margin, 2),
+            "margin_level": round(self._equity / max(0.01, self._margin) * 100, 1) if self._margin > 0 else None,
+            "open_orders": len(self._orders),
+            "floating_pnl": round(self._equity - self._balance, 2),
+            "equity_snapshots": deepcopy(self._account_snapshots[-10:]),
+        }

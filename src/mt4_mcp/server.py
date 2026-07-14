@@ -125,5 +125,23 @@ def mt4_history(limit: int = 20) -> str:
     return _j(get_backend().history(limit=limit))
 
 
+@mcp.tool()
+def mt4_history_export_json() -> str:
+    """Export closed trade history with summary stats (total profit, win rate)."""
+    return _j(get_backend().history_export_json())
+
+
+@mcp.tool()
+def mt4_quote_snapshot() -> str:
+    """Bid/ask quotes for all symbols with timestamps."""
+    return _j(get_backend().quote_snapshot())
+
+
+@mcp.tool()
+def mt4_account_summary() -> str:
+    """Detailed account summary: balance, equity, margin, floating PnL, equity snapshots."""
+    return _j(get_backend().account_summary())
+
+
 def run_stdio() -> None:
     mcp.run(transport="stdio")

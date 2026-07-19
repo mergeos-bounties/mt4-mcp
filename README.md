@@ -123,7 +123,7 @@ mt4-mcp tools list
 pytest -q
 ```
 
-Mock mode needs **no** MetaTrader install.
+Mock mode needs **no** MetaTrader install. For a copy-pasteable offline trading walkthrough, see [docs/MOCK_TRADING_DEMO.md](docs/MOCK_TRADING_DEMO.md).
 
 ---
 

@@ -229,6 +229,13 @@ mt4-mcp demo
 
 ---
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, testing, and the MergeOS bounty
+claim flow.
+
+---
+
 ## License
 
 [MIT](LICENSE)
